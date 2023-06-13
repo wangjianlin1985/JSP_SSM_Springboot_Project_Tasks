@@ -1,0 +1,48 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.GroupMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加分组记录 -->
+	<insert id="addGroup" parameterType="group">
+		insert into t_group(groupName) values 
+		(#{groupName})
+	</insert>
+
+	<!-- 按照查询条件分页查询分组记录 -->
+	<select id="queryGroup" resultMap="groupMap" >
+		select t_group.* from t_group ${where} limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="groupMap" type="group">
+        <id property="groupId" column="groupId" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有分组记录 -->
+	<select id="queryGroupList" resultMap="groupMap" >
+		select t_group.* from t_group ${where}
+	</select>
+
+    <!-- 按照查询条件的分组记录数 -->
+	<select id="queryGroupCount" resultType="int">
+		select count(*) from t_group ${where}
+	</select>
+
+	<!-- 根据主键查询某个分组记录 -->
+	<select id="getGroup" parameterType="int" resultMap="groupMap">
+		select * from t_group where t_group.groupId = #{groupId}
+	</select>
+
+	<!-- 更新分组记录 -->
+	<update id="updateGroup" parameterType="group">
+		update t_group set groupName=#{groupName} where groupId = #{groupId}
+	</update>
+
+	<!-- 删除分组记录 -->
+	<delete id="deleteGroup" parameterType="int">
+		delete from t_group where groupId=#{groupId}
+	</delete>
+
+</mapper>

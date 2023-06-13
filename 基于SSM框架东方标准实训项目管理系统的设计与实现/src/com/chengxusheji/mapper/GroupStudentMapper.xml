@@ -1,0 +1,50 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.GroupStudentMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加分组成员记录 -->
+	<insert id="addGroupStudent" parameterType="groupStudent">
+		insert into t_groupStudent(groupObj,studentObj) values 
+		(#{groupObj.groupId},#{studentObj.studentNumber})
+	</insert>
+
+	<!-- 按照查询条件分页查询分组成员记录 -->
+	<select id="queryGroupStudent" resultMap="groupStudentMap" >
+		select t_groupStudent.* from t_groupStudent,t_group,t_student ${where} and t_groupStudent.groupObj = t_group.groupId and t_groupStudent.studentObj = t_student.studentNumber limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="groupStudentMap" type="groupStudent">
+        <id property="gsId" column="gsId" />
+        <association property="groupObj" column="groupObj" select="com.chengxusheji.mapper.GroupMapper.getGroup" />
+        <association property="studentObj" column="studentObj" select="com.chengxusheji.mapper.StudentMapper.getStudent" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有分组成员记录 -->
+	<select id="queryGroupStudentList" resultMap="groupStudentMap" >
+		select t_groupStudent.* from t_groupStudent,t_group,t_student ${where} and t_groupStudent.groupObj = t_group.groupId and t_groupStudent.studentObj = t_student.studentNumber
+	</select>
+
+    <!-- 按照查询条件的分组成员记录数 -->
+	<select id="queryGroupStudentCount" resultType="int">
+		select count(*) from t_groupStudent,t_group,t_student ${where} and t_groupStudent.groupObj = t_group.groupId and t_groupStudent.studentObj = t_student.studentNumber
+	</select>
+
+	<!-- 根据主键查询某个分组成员记录 -->
+	<select id="getGroupStudent" parameterType="int" resultMap="groupStudentMap">
+		select * from t_groupStudent where t_groupStudent.gsId = #{gsId}
+	</select>
+
+	<!-- 更新分组成员记录 -->
+	<update id="updateGroupStudent" parameterType="groupStudent">
+		update t_groupStudent set groupObj=#{groupObj.groupId},studentObj=#{studentObj.studentNumber} where gsId = #{gsId}
+	</update>
+
+	<!-- 删除分组成员记录 -->
+	<delete id="deleteGroupStudent" parameterType="int">
+		delete from t_groupStudent where gsId=#{gsId}
+	</delete>
+
+</mapper>

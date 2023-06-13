@@ -1,0 +1,50 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ResourceInfoMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加资源记录 -->
+	<insert id="addResourceInfo" parameterType="resourceInfo">
+		insert into t_resourceInfo(projectObj,studentObj,resourceFile,resourceDesc,addTime,evaluateContent) values 
+		(#{projectObj.projectId},#{studentObj.studentNumber},#{resourceFile},#{resourceDesc},#{addTime},#{evaluateContent})
+	</insert>
+
+	<!-- 按照查询条件分页查询资源记录 -->
+	<select id="queryResourceInfo" resultMap="resourceInfoMap" >
+		select t_resourceInfo.* from t_resourceInfo,t_project,t_student ${where} and t_resourceInfo.projectObj = t_project.projectId and t_resourceInfo.studentObj = t_student.studentNumber limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="resourceInfoMap" type="resourceInfo">
+        <id property="resourceId" column="resourceId" />
+        <association property="projectObj" column="projectObj" select="com.chengxusheji.mapper.ProjectMapper.getProject" />
+        <association property="studentObj" column="studentObj" select="com.chengxusheji.mapper.StudentMapper.getStudent" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有资源记录 -->
+	<select id="queryResourceInfoList" resultMap="resourceInfoMap" >
+		select t_resourceInfo.* from t_resourceInfo,t_project,t_student ${where} and t_resourceInfo.projectObj = t_project.projectId and t_resourceInfo.studentObj = t_student.studentNumber
+	</select>
+
+    <!-- 按照查询条件的资源记录数 -->
+	<select id="queryResourceInfoCount" resultType="int">
+		select count(*) from t_resourceInfo,t_project,t_student ${where} and t_resourceInfo.projectObj = t_project.projectId and t_resourceInfo.studentObj = t_student.studentNumber
+	</select>
+
+	<!-- 根据主键查询某个资源记录 -->
+	<select id="getResourceInfo" parameterType="int" resultMap="resourceInfoMap">
+		select * from t_resourceInfo where t_resourceInfo.resourceId = #{resourceId}
+	</select>
+
+	<!-- 更新资源记录 -->
+	<update id="updateResourceInfo" parameterType="resourceInfo">
+		update t_resourceInfo set projectObj=#{projectObj.projectId},studentObj=#{studentObj.studentNumber},resourceFile=#{resourceFile},resourceDesc=#{resourceDesc},addTime=#{addTime},evaluateContent=#{evaluateContent} where resourceId = #{resourceId}
+	</update>
+
+	<!-- 删除资源记录 -->
+	<delete id="deleteResourceInfo" parameterType="int">
+		delete from t_resourceInfo where resourceId=#{resourceId}
+	</delete>
+
+</mapper>

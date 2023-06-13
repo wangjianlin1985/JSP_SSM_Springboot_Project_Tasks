@@ -1,0 +1,49 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.JournalMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加项目日志记录 -->
+	<insert id="addJournal" parameterType="journal">
+		insert into t_journal(title,content,studentObj,addTime,teacherNo,replyContent,replyTime) values 
+		(#{title},#{content},#{studentObj.studentNumber},#{addTime},#{teacherNo},#{replyContent},#{replyTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询项目日志记录 -->
+	<select id="queryJournal" resultMap="journalMap" >
+		select t_journal.* from t_journal,t_student ${where} and t_journal.studentObj = t_student.studentNumber limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="journalMap" type="journal">
+        <id property="journalId" column="journalId" />
+        <association property="studentObj" column="studentObj" select="com.chengxusheji.mapper.StudentMapper.getStudent" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有项目日志记录 -->
+	<select id="queryJournalList" resultMap="journalMap" >
+		select t_journal.* from t_journal,t_student ${where} and t_journal.studentObj = t_student.studentNumber
+	</select>
+
+    <!-- 按照查询条件的项目日志记录数 -->
+	<select id="queryJournalCount" resultType="int">
+		select count(*) from t_journal,t_student ${where} and t_journal.studentObj = t_student.studentNumber
+	</select>
+
+	<!-- 根据主键查询某个项目日志记录 -->
+	<select id="getJournal" parameterType="int" resultMap="journalMap">
+		select * from t_journal where t_journal.journalId = #{journalId}
+	</select>
+
+	<!-- 更新项目日志记录 -->
+	<update id="updateJournal" parameterType="journal">
+		update t_journal set title=#{title},content=#{content},studentObj=#{studentObj.studentNumber},addTime=#{addTime},teacherNo=#{teacherNo},replyContent=#{replyContent},replyTime=#{replyTime} where journalId = #{journalId}
+	</update>
+
+	<!-- 删除项目日志记录 -->
+	<delete id="deleteJournal" parameterType="int">
+		delete from t_journal where journalId=#{journalId}
+	</delete>
+
+</mapper>
